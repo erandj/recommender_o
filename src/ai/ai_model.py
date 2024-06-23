@@ -405,10 +405,15 @@ class RecommendationEngine:
     def save_model(self, file_path: str):
         print(file_path)
         os.makedirs(file_path, exist_ok=True)
-        with open(file_path + 'model.pkl', 'wb') as f:
+
+        count = 1
+        for filename in os.listdir(file_path):
+            if "model" in filename:
+                count += 1
+
+        with open(file_path + 'model' + str(count) + '.pkl', 'wb') as f:
             pickle.dump(self.reg_random_forest_model, f)
 
     def load_model(self, file_path: str):
         with open(file_path + 'model.pkl', 'rb') as f:
             self.reg_random_forest_model = pickle.load(f)
-

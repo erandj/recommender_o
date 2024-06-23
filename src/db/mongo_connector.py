@@ -13,7 +13,7 @@ def save_filepath_to_model(user_id: str, file_path: str):
     """
     model_doc = UserModelTemplate(user_id, file_path)
 
-    result = collection.insert_one(model_doc._asdict())
+    result = collection.update_one({"user_id": user_id}, {"$set": model_doc._asdict()}, upsert=True)
 
 
 def retrieve_model(user_id: str):
@@ -25,7 +25,7 @@ def retrieve_model(user_id: str):
     The document with filepath as UserModelTemplate class.
     """
     document = collection.find_one({"user_id": user_id})
-    
+
     user = UserModelTemplate(document["user_id"], document["file_path"])
 
     if not user:

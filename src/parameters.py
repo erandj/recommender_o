@@ -1,6 +1,6 @@
 # RandomForest
 import os
-from typing import NamedTuple
+from typing import List, NamedTuple
 
 
 test_random_state = 10
@@ -12,7 +12,7 @@ params_random_tree = {
 }
 
 # MongoDB
-mongoDB_url = "mongodb://localhost:27017"
+mongoDB_url = "mongodb://model_mongodb:27017"
 mongoDB_db_name = "recommenderDB"
 mongoDB_collection_name = "user_models"
 

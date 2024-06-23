@@ -1,3 +1,4 @@
+import os
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.responses import FileResponse
@@ -32,18 +33,51 @@ async def create_engine(model: TrainDataModel, user_id: str | None = None):
     if user_id is None:
         user_id = str(uuid.uuid4())
 
-    file_path = f"{root_filepath}\\user_engines\\{user_id}\\"
-    file_path = f"{root_filepath}\\user_engines\\{user_id}\\"
+    file_path = f"{root_filepath}/user_engines/{user_id}/"
+    file_path = f"{root_filepath}/user_engines/{user_id}/"
     engine.save_model(file_path)
     user = mongo_connector.save_filepath_to_model(user_id, file_path)
 
     return {"id": user_id}
 
 
+# @router.post("/get_model")
+# async def get_model(user_id: str):
+#     user = mongo_connector.retrieve_model(user_id)
+    
+#     if not user:
+#         HTTPException(404, "The user not found")
+
+#     return FileResponse(user.file_path+'model.pkl', 
+#                         media_type="application/octet-stream", 
+#                         filename="model.pkl")
+
+
+from fastapi.responses import StreamingResponse
+from io import BytesIO
+from zipfile import ZipFile
+
 @router.post("/get_model")
 async def get_model(user_id: str):
     user = mongo_connector.retrieve_model(user_id)
     
+    if not user:
+        HTTPException(404, "The user not found")
+
+    zip_buffer = BytesIO()
+
+    with ZipFile(zip_buffer, "w") as zip_file:
+        # Add files to the archive
+        for filename in os.listdir(user.file_path):
+            file_path = os.path.join(user.file_path, filename)
+            zip_file.write(file_path, arcname=filename)
+
+    zip_buffer.seek(0)
+
+    return StreamingResponse(zip_buffer, 
+                             media_type="application/zip", 
+                             headers={"Content-Disposition": "attachment; filename=files.zip"})
+
     return FileResponse(user.file_path+'model.pkl', 
                         media_type="application/octet-stream", 
                         filename="model.pkl")

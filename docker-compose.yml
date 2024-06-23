@@ -1,0 +1,42 @@
+version: '3.8'
+
+name: 'generate_model'
+services:
+  model_api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: model_api
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/app
+    environment:
+      - PORT=8080
+    depends_on:
+      - model_mongodb
+    networks:
+      - model_network
+
+  model_mongodb:
+    image: mongo:latest
+    container_name: model_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    networks:
+      - model_network
+
+networks:
+  model_network:
+    driver: bridge
+
+
+volumes:
+  mongo_data:
