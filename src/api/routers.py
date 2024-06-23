@@ -57,10 +57,6 @@ async def create_model(model: TrainDataModel, title: str, description: str, crea
     # Получение размера файла
     file_size = os.path.getsize(file_path)
 
-    # Получение текущего времени, если created_At не задано
-    if created_At is None:
-        created_At = datetime.now()
-
     # Сохранение модели в базе данных MongoDB
     result = mongo_connector.save_model(title, description, user_id, str(file_size), model_file_path, created_At)
 
