@@ -5,12 +5,17 @@ import logging
 from fastapi.responses import RedirectResponse
 from src.api import routers
 from fastapi import FastAPI
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
 
 
 test_data_folder = "test_data/"
 
 app = FastAPI()
 app.include_router(routers.router)
+
+model_files_directory = Path("/app/src/user_models")
+app.mount("/files/models", StaticFiles(directory=model_files_directory), name="model_files")
 
 @app.get("/", include_in_schema=False)
 async def root():
