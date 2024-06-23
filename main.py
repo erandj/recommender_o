@@ -7,12 +7,27 @@ from src.api import routers
 from fastapi import FastAPI
 from pathlib import Path
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 
 
 test_data_folder = "test_data/"
 
+origins = [
+    "https://animila.ru",
+    "https://www.animila.ru",
+    "https://api.animila.ru",
+]
+
 app = FastAPI()
 app.include_router(routers.router)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["*"],
+)
 
 model_files_directory = Path("/app/src/user_models")
 app.mount("/files/models", StaticFiles(directory=model_files_directory), name="model_files")
